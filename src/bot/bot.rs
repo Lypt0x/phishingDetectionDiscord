@@ -14,7 +14,7 @@ impl Bot {
 
     pub async fn new(token: &str) -> DynError<Self> {
         Ok(Self {
-            client: ClientBuilder::new(token).event_handler(Handler).await?
+            client: ClientBuilder::new(token).event_handler(Handler::new()).await?
         })
     }
 
