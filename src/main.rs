@@ -1,4 +1,5 @@
 mod bot;
+mod rest;
 use std::borrow::Borrow;
 
 use bot::bot::*;
