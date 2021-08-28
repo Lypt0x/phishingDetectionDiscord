@@ -1,5 +1,5 @@
 [package]
-name = "phishingDetectionDiscord"
+name = "phishing_detection_discord"
 version = "0.1.0"
 authors = ["Lypt0x <2xlyptox@gmail.com>"]
 edition = "2018"
