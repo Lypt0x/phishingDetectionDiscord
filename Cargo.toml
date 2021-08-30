@@ -12,10 +12,17 @@ default-features = false
 features = ["client", "gateway", "rustls_backend", "model"]
 
 [dependencies]
-tokio = { version = "1.10.0", features = ["macros", "rt-multi-thread"] }
+
+#url parsing
 linkify = "0.7.0"
+url = "2.2.2"
+
+#de-/serialization stuff
 lazy_static = "1.4.0"
 serde = "1.0.129"
 serde_json = "1.0.66"
+
+#networking and concurrency
+tokio = { version = "1.10.0", features = ["macros", "rt-multi-thread"] }
 reqwest = "0.11.4"
 tokio-stream = "0.1.7"

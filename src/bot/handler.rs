@@ -27,8 +27,12 @@ impl EventHandler for Handler {
 
     }
 
-    async fn message(&self, _context: Context, message: Message) {
-        self.safebrowsing.lock().await.is_safe(&message.content).await;
+    async fn message(&self, context: Context, message: Message) {
+        let safe = self.safebrowsing.lock().await.is_safe(&message.content).await;
+        if safe != -1 {
+            message.delete(Arc::clone(&context.http))
+                .await.expect(&format!("phising @ {}", message.id.0));
+        }
     }
 
 

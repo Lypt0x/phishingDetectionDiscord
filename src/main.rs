@@ -1,7 +1,7 @@
 mod bot;
 mod rest;
-use std::borrow::Borrow;
 
+use std::borrow::Borrow;
 use bot::bot::*;
 
 #[tokio::main]
