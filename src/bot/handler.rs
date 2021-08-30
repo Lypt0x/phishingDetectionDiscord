@@ -1,5 +1,5 @@
-use std::sync::{Arc};
-use tokio::sync::{Mutex};
+use std::sync::Arc;
+use tokio::sync::Mutex;
 
 use crate::rest::safebrowsing::Safebrowsing;
 
@@ -11,10 +11,12 @@ pub struct Handler {
 
 impl Handler {
     pub fn new() -> Self {
+        
         Self {
             safebrowsing: Arc::new(Mutex::new(Safebrowsing::new()))
         }
     }
+
 }
 
 #[async_trait]
@@ -25,9 +27,9 @@ impl EventHandler for Handler {
 
     }
 
-    async fn message(&self, context: Context, message: Message) {
-        let mut safebrowsing = self.safebrowsing.lock().await;
-        safebrowsing.is_safe(&message.content).await;
+    async fn message(&self, _context: Context, message: Message) {
+        self.safebrowsing.lock().await.is_safe(&message.content).await;
     }
+
 
 }

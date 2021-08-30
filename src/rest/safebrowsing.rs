@@ -1,4 +1,4 @@
-use linkify::LinkFinder;
+use linkify::{Link, LinkFinder};
 
 pub struct Safebrowsing {
     denylist: Vec<String>,
@@ -14,17 +14,15 @@ impl Safebrowsing {
         }
     }
 
-    pub async fn is_safe(&mut self, input: &str) {
+    pub async fn is_safe(&mut self, input: &str) -> bool {
 
-        /*
-        -> Not using it yet because of debugging
-        if links.any(|link| self.denylist.contains(&link.as_str().to_lowercase())) {
-            return false;
-        }*/
-
-        let links = self.finder.links(input);
-
+        let links = self.finder.links(input).collect::<Vec<Link>>();
         for link in links {
+            
+            if self.denylist.contains(&link.as_str().to_string().to_lowercase()) {
+                return true;
+            }
+
             match reqwest::get(&format!("{}{}", super::constants::SAFEBROWSING_ENDPOINT, link.as_str())).await {
                 Ok(response) => {
                     println!("{}", response.text().await.expect("response has no content"));
@@ -34,7 +32,8 @@ impl Safebrowsing {
                 }
             }
         }
-
+        
+        false
     }
 
 }
