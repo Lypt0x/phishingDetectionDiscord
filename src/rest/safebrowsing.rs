@@ -38,8 +38,9 @@ impl Safebrowsing {
                             let safe_state = root.pointer("/1")
                                 .expect("safe state pointee").as_u64()
                                 .expect("safe state value");
-                            if safe_state == 6 || safe_state == 1 {
-                                let time = root.pointer("/7").expect("time pointee").as_i64().expect("time value");
+                            if safe_state == 6 || safe_state == 1 || safe_state == 2 {
+                                let time = root.pointer("/7")
+                                    .expect("time pointee").as_i64().expect("time value");
                                 self.denylist.insert(url, time);
                                 return time;
                             }

@@ -1,5 +1,6 @@
 mod bot;
 mod rest;
+mod metric;
 
 use std::borrow::Borrow;
 use bot::bot::*;
