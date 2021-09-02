@@ -4,9 +4,11 @@ use linkify::{Link, LinkFinder};
 use serde_json::Value;
 use url::Url;
 
+use crate::metric::*;
 pub struct Safebrowsing {
     denylist: HashMap<String, i64>,
-    finder: LinkFinder
+    finder: LinkFinder,
+    metrics: Metrics
 }
 
 impl Safebrowsing {
@@ -14,8 +16,13 @@ impl Safebrowsing {
     pub fn new() -> Self {
         Self {
             denylist: HashMap::new(),
-            finder: LinkFinder::new()
+            finder: LinkFinder::new(),
+            metrics: Metrics::new()
         }
+    }
+
+    pub fn metrics(&self) -> &Metrics {
+        &self.metrics
     }
 
     pub async fn is_safe(&mut self, input: &str) -> i64 {
@@ -28,6 +35,7 @@ impl Safebrowsing {
             let url = url.to_string().to_ascii_lowercase();
 
             if self.denylist.contains_key(&url) {
+                self.metrics.increment(MetricType::Cached);
                 return self.denylist[&url];
             }
 
@@ -42,8 +50,10 @@ impl Safebrowsing {
                                 let time = root.pointer("/7")
                                     .expect("time pointee").as_i64().expect("time value");
                                 self.denylist.insert(url, time);
+                                self.metrics.increment(MetricType::Unhealthy);
                                 return time;
                             }
+                            self.metrics.increment(MetricType::Healthy);
                         }
                     }   
                 },

@@ -1,5 +1,4 @@
-use lazy_static::__Deref;
-use prometheus::{Counter, Opts, Registry, core::Collector};
+use prometheus::{Counter, Encoder, Opts, Registry, TextEncoder, core::Collector};
 
 pub struct Metrics {
     registry: Registry,
@@ -39,8 +38,13 @@ impl Metrics {
         }
     }
 
-    pub fn gather(&self) {
+    pub fn gather(&self) -> Vec<u8> {
+        let mut buffer = vec![];
+        let encoder = TextEncoder::new();
+        let metric_families = self.registry.gather();
         
+        encoder.encode(&metric_families, &mut buffer).expect("encode");
+        buffer
     }
 
 }
