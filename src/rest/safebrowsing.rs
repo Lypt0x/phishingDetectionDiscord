@@ -1,4 +1,5 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::Arc};
+use tokio::sync::RwLock;
 
 use linkify::{Link, LinkFinder};
 use serde_json::Value;
@@ -8,7 +9,7 @@ use crate::metric::*;
 pub struct Safebrowsing {
     denylist: HashMap<String, i64>,
     finder: LinkFinder,
-    metrics: Metrics
+    metrics: Arc<RwLock<Metrics>>
 }
 
 impl Safebrowsing {
@@ -17,12 +18,12 @@ impl Safebrowsing {
         Self {
             denylist: HashMap::new(),
             finder: LinkFinder::new(),
-            metrics: Metrics::new()
+            metrics: Arc::new(RwLock::new(Metrics::new()))
         }
     }
 
-    pub fn metrics(&self) -> &Metrics {
-        &self.metrics
+    pub fn metrics(&self) -> Arc<RwLock<Metrics>> {
+        Arc::clone(&self.metrics)
     }
 
     pub async fn is_safe(&mut self, input: &str) -> i64 {
@@ -34,8 +35,10 @@ impl Safebrowsing {
             url.set_query(None);
             let url = url.to_string().to_ascii_lowercase();
 
+            let mut metrics = self.metrics.write().await;
+
             if self.denylist.contains_key(&url) {
-                self.metrics.increment(MetricType::Cached);
+                metrics.increment(MetricType::Cached);
                 return self.denylist[&url];
             }
 
@@ -50,10 +53,10 @@ impl Safebrowsing {
                                 let time = root.pointer("/7")
                                     .expect("time pointee").as_i64().expect("time value");
                                 self.denylist.insert(url, time);
-                                self.metrics.increment(MetricType::Unhealthy);
+                                metrics.increment(MetricType::Unhealthy);
                                 return time;
                             }
-                            self.metrics.increment(MetricType::Healthy);
+                            metrics.increment(MetricType::Healthy);
                         }
                     }   
                 },

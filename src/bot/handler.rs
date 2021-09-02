@@ -1,9 +1,9 @@
 use std::sync::{Arc};
-use tokio::sync::{RwLock, RwLockReadGuard};
+use tokio::sync::{RwLock};
 
 use crate::{metric::Metrics, rest::safebrowsing::{Safebrowsing}};
 
-use serenity::{FutureExt, async_trait, client::{Context, EventHandler}, model::{channel::Message, prelude::Ready}};
+use serenity::{async_trait, client::{Context, EventHandler}, model::{channel::Message, prelude::Ready}};
 
 pub struct Handler {
     safebrowsing: Arc<RwLock<Safebrowsing>>,
@@ -18,8 +18,8 @@ impl Handler {
         }
     }
 
-    pub async fn safebrowsing(&self) -> Arc<RwLock<Safebrowsing>> {
-        Arc::clone(&self.safebrowsing)
+    pub async fn metrics(&self) -> Arc<RwLock<Metrics>> {
+        self.safebrowsing.read().await.metrics()
     }
 
 }

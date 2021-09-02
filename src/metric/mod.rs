@@ -1,4 +1,4 @@
-use prometheus::{Counter, Encoder, Opts, Registry, TextEncoder, core::Collector};
+use prometheus::{Counter, Encoder, Opts, Registry, TextEncoder};
 
 pub struct Metrics {
     registry: Registry,
